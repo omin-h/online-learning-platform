@@ -1,8 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateInstructorDto } from './create-instructor.dto';
-import { IsNotEmpty } from 'class-validator/types/decorator/common/IsNotEmpty';
-import { IsString } from 'class-validator/types/decorator/typechecker/IsString';
-import { IsAlphanumeric, IsEmail } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, IsAlphanumeric } from "class-validator";
 
 export class UpdateInstructorDto extends PartialType(CreateInstructorDto) {
     @IsString()
