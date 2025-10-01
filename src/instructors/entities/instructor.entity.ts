@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Course } from "src/courses/entities/course.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Instructor {
@@ -6,18 +7,21 @@ export class Instructor {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: 'varchar', length: 30 })
+    @Column({ length: 30 })
     name: string;
 
-    @Column({ type: 'varchar', length: 100 })
+    @Column({ length: 100 })
     email: string;
 
-    @Column({ type: 'varchar', length: 100 })
+    @Column({ length: 100 })
     expertise: string;
 
-    @Column({ type: 'varchar', length: 15, unique: true })
+    @Column({ length: 15, unique: true })
     username: string;
 
-    @Column({ type: 'varchar' })
+    @Column()
     password: string;
+
+    @OneToMany(() => Course, course => course.instructor)
+    courses: Course[];
 }
