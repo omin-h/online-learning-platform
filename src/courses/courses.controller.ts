@@ -23,6 +23,11 @@ export class CoursesController {
     return this.coursesService.findOne(+id);
   }
 
+  @Get('instructor/:instructorId')
+  findByInstructor(@Param('instructorId') instructorId: string) {
+    return this.coursesService.findByInstructor(+instructorId);
+  }
+
   @Put(':id')
     update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
       return this.coursesService.update(+id, updateCourseDto);

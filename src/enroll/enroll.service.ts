@@ -31,8 +31,13 @@ export class EnrollService {
     return this.enrollRepository.findOneBy({ id });
   }
 
-  update(id: number, updateEnrollDto: UpdateEnrollDto) {
-    return this.enrollRepository.save({ id, ...updateEnrollDto });
+  async updateStatus(id: number, status: string): Promise<Enroll> {
+  const enroll = await this.enrollRepository.findOneBy({ id });
+  if (!enroll) {
+    throw new Error('Enrollment not found');
+  }
+  enroll.status = status;
+  return this.enrollRepository.save(enroll);
   }
 
   remove(id: number) {

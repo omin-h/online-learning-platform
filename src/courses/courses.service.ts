@@ -30,6 +30,14 @@ export class CoursesService {
       return this.courseRepository.findOneBy({ id });
     }
 
+
+  async findByInstructor(instructorId: number): Promise<Course[]> {
+  return this.courseRepository.find({
+    where: { instructor: { id: instructorId } },
+    relations: ['instructor'],
+  });
+}
+
   update(id: number, updateCourseDto: UpdateCourseDto): Promise<Course> {
       const course: Course = new Course();
       course.id = id;
@@ -40,7 +48,7 @@ export class CoursesService {
       return this.courseRepository.save(course);
     }
 
-  remove(id: number) {
-    return this.courseRepository.delete(id);
+   remove(id: number): Promise<void> {
+    return this.courseRepository.delete(id).then(() => {});
   }
 }

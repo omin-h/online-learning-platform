@@ -8,10 +8,10 @@ export class Enroll {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => Course, course => course.enrollments)
+    @ManyToOne(() => Course, course => course.enrollments, { onDelete: 'CASCADE' })
     course: Course;
 
-    @ManyToOne(() => Student, student => student.enrollments)
+    @ManyToOne(() => Student, student => student.enrollments, { onDelete: 'CASCADE' })
     student: Student;
 
     @Column()
