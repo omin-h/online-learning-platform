@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { CreateEnrollDto } from './dto/create-enroll.dto';
 import { UpdateEnrollDto } from './dto/update-enroll.dto';
 import { Student } from 'src/students/entities/student.entity';
@@ -14,17 +14,24 @@ export class EnrollService {
   @InjectRepository(Enroll) private readonly enrollRepository: Repository<Enroll>
   ) {}
 
-  async create(createEnrollDto: CreateEnrollDto): Promise<Enroll> {
+  async create(createEnrollDto: CreateEnrollDto): Promise<{ message: string; enroll: Enroll }> {
     const enroll = new Enroll();
     enroll.course = { id: createEnrollDto.courseId } as Course;
     enroll.student = { id: createEnrollDto.studentId } as Student;
     enroll.enrollmentDate = createEnrollDto.enrollmentDate;
     enroll.status = "pending";
-    return this.enrollRepository.save(enroll);
+    try{ const savedEnroll = await this.enrollRepository.save(enroll);
+    return { message: 'Enrollment request sent successfully', enroll: savedEnroll };
+    }catch (error) {
+      throw new BadRequestException('Error sending enrollment: ' + error.message);
+    }
   }
   
   findAll() {
-    return this.enrollRepository.find();
+    try{return this.enrollRepository.find();
+    }catch (error) {
+      throw new BadRequestException('Error fetching enrollments: ' + error.message);
+    }
   }
 
   findOne(id: number) {

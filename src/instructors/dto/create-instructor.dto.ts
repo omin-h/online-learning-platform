@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsNotEmpty, IsAlphanumeric } from "class-validator";
+import { IsString, IsEmail, IsNotEmpty, IsAlphanumeric, IsArray } from "class-validator";
 
 export class CreateInstructorDto {
 
@@ -12,7 +12,8 @@ export class CreateInstructorDto {
 
     @IsString()
     @IsNotEmpty()
-    expertise: string;
+    @IsArray()
+    expertise: string[];
 
     @IsString()
     @IsNotEmpty()

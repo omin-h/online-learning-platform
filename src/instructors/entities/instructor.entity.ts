@@ -13,8 +13,8 @@ export class Instructor {
     @Column({ length: 100 })
     email: string;
 
-    @Column({ length: 100 })
-    expertise: string;
+    @Column("simple-array")
+    expertise: string[];
 
     @Column({ length: 15, unique: true })
     username: string;
