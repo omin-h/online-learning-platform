@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Instructor } from './entities/instructor.entity';
 import { CreateInstructorDto } from './dto/create-instructor.dto';
 import { UpdateInstructorDto } from './dto/update-instructor.dto';
@@ -14,35 +14,51 @@ export class InstructorsService {
   ) {}
 
 
-  create(createInstructorDto: CreateInstructorDto): Promise<Instructor> {
+  async create(createInstructorDto: CreateInstructorDto): Promise<{ message: string; instructor: Instructor }> {
     const instructor : Instructor = new Instructor();
     instructor.name = createInstructorDto.name;
     instructor.email = createInstructorDto.email;
     instructor.expertise = createInstructorDto.expertise;
     instructor.username = createInstructorDto.username;
     instructor.password = createInstructorDto.password;
-    return this.instructorRepository.save(instructor);
-  }
+    const savedInstructor = await this.instructorRepository.save(instructor);
+    return { message: 'Instructor created successfully', instructor: savedInstructor };
+    } catch (error) {
+      throw new BadRequestException('Error creating instructor: ' + error.message);
+    }
 
 
-  async findAll({ page, limit }: PaginationQueryDto,
+  async findAll({ page, limit, search }: PaginationQueryDto,
     ): Promise<{ data: Instructor[]; total: number; page: number; limit: number }> {
-      const skip = (page - 1) * limit;
+     try{ const skip = (page - 1) * limit;
      
       const [data, total] = await this.instructorRepository.findAndCount({
         skip,
         take: limit,
+        where: search ? [
+          { name: Like(`%${search}%`) },
+          { email: Like(`%${search}%`) },
+          { expertise: Like(`%${search}%`) },
+          { username: Like(`%${search}%`) },
+        ] : {},
       });
         return { data, total, page, limit };
+    }catch (error) {
+      throw new BadRequestException('Error fetching instructors: ' + error.message);
+    }
   }
 
 
-  findOne(id: number): Promise<Instructor | null> {
-    return this.instructorRepository.findOneBy({ id });
+  async findOne(id: number): Promise<Instructor | null> {
+    const instructor = await this.instructorRepository.findOneBy({ id });
+    if (!instructor) {
+      throw new NotFoundException(`Instructor with id ${id} not found`);
+    }
+    return instructor;
   }
 
 
-  update(id: number, updateInstructorDto: UpdateInstructorDto): Promise<Instructor> {
+  async update(id: number, updateInstructorDto: UpdateInstructorDto): Promise<{ message: string; instructor: Instructor }> {
     const instructor: Instructor = new Instructor();
     instructor.id = id;
     instructor.name = updateInstructorDto.name;
@@ -50,11 +66,20 @@ export class InstructorsService {
     instructor.expertise = updateInstructorDto.expertise;
     instructor.username = updateInstructorDto.username;
     instructor.password = updateInstructorDto.password;
-    return this.instructorRepository.save(instructor);
+    try{
+      const updatedInstructor = await this.instructorRepository.save(instructor);
+    return { message: 'Instructor updated successfully', instructor: updatedInstructor };
+    }catch (error) {
+      throw new BadRequestException('Error updating instructor: ' + error.message);
+    }
   }
 
 
-  remove(id: number): Promise<void> {
-    return this.instructorRepository.delete(id).then(() => {});
+  async remove(id: number): Promise<{ message: string }> {
+    const result = await this.instructorRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Instructor with id ${id} not found`);
+    }
+    return { message: 'Instructor removed successfully' };
   }
 }

@@ -66,7 +66,8 @@ export class StudentsService {
       student.userName = updateStudentDto.userName;
       student.password = updateStudentDto.password;
       student.enrollmentDate = updateStudentDto.enrollmentDate;
-      try{const updatedStudent = await this.studentRepository.save(student);
+      try{
+        const updatedStudent = await this.studentRepository.save(student);
       return { message: 'Student updated successfully', student: updatedStudent };
       }catch (error) {
         throw new BadRequestException('Error updating student: ' + error.message);

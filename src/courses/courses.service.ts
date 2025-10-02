@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course } from './entities/course.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Instructor } from 'src/instructors/entities/instructor.entity';
 import { PaginationQueryDto } from 'src/common/pagination-query.dto';
 
@@ -14,48 +14,76 @@ export class CoursesService {
       @InjectRepository(Course) private readonly courseRepository: Repository<Course>
     ) {}
 
-  async create(createCourseDto: CreateCourseDto): Promise<Course> {
+  async create(createCourseDto: CreateCourseDto): Promise<{ message: string; course: Course }> {
     const course = new Course();
     course.title = createCourseDto.title;
     course.description = createCourseDto.description;
     course.duration = createCourseDto.duration;
     course.instructor = { id: createCourseDto.instructorId } as any;
-    return this.courseRepository.save(course);
+    try{ const savedCourse = await this.courseRepository.save(course);
+    return { message: 'Course created successfully', course: savedCourse };
+    }catch (error) {
+      throw new BadRequestException('Error creating course: ' + error.message);
+    }
   }
 
-  async findAll({ page, limit }: PaginationQueryDto,): Promise<{ data: Course[]; total: number; page: number; limit: number }> {
-       const skip = (page - 1) * limit;
+  async findAll({ page, limit, search }: PaginationQueryDto,): Promise<{ data: Course[]; total: number; page: number; limit: number }> {
+       try{const skip = (page - 1) * limit;
 
         const [data, total] = await this.courseRepository.findAndCount({
           skip,
           take: limit,
+          where: search ? [
+            { title: Like(`%${search}%`) },
+            { description: Like(`%${search}%`) },
+          ] : {},
         });
-          return { data, total, page, limit };
+        return { data, total, page, limit };
+      } catch (error) {
+          throw new BadRequestException('Error fetching courses: ' + error.message);
+        }
   }
 
   findOne(id: number): Promise<Course | null> {
-      return this.courseRepository.findOneBy({ id });
+      const course = this.courseRepository.findOneBy({ id });
+      if (!course) {
+        throw new NotFoundException(`Course with id ${id} not found`);
+      }
+      return course;
     }
 
 
   async findByInstructor(instructorId: number): Promise<Course[]> {
-  return this.courseRepository.find({
+  const courses = await this.courseRepository.find({
     where: { instructor: { id: instructorId } },
     relations: ['instructor'],
   });
+  if (courses.length === 0) {
+    throw new NotFoundException(`No courses found for instructor with id ${instructorId}`);
+  }
+  return courses;
 }
 
-  update(id: number, updateCourseDto: UpdateCourseDto): Promise<Course> {
+  async update(id: number, updateCourseDto: UpdateCourseDto): Promise<{ message: string; course: Course }> {
       const course: Course = new Course();
       course.id = id;
       course.title = updateCourseDto.title;
       course.description = updateCourseDto.description;
       course.duration = updateCourseDto.duration;
       course.instructor = { id: updateCourseDto.instructorId } as Instructor;
-      return this.courseRepository.save(course);
+      try{const updatedCourse = await this.courseRepository.save(course);
+      return { message: 'Course updated successfully', course: updatedCourse };
+      } catch (error) {
+        throw new BadRequestException('Error updating course: ' + error.message);
+      }
     }
 
-   remove(id: number): Promise<void> {
-    return this.courseRepository.delete(id).then(() => {});
-  }
+   async remove(id: number): Promise<{ message: string }> {
+
+       const result = await this.courseRepository.delete(id);
+       if (result.affected === 0) {
+         throw new NotFoundException(`Course with id ${id} not found`);
+       }
+       return { message: 'Course removed successfully' };
+   }
 }
