@@ -4,6 +4,7 @@ import { UpdateStudentDto } from './dto/update-student.dto';
 import { Student } from './entities/student.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginationQueryDto } from 'src/common/pagination-query.dto';
 
 @Injectable()
 export class StudentsService {
@@ -23,8 +24,14 @@ export class StudentsService {
       return this.studentRepository.save(student);
     }
 
-  findAll(): Promise<Student[]> {
-    return this.studentRepository.find();
+  async findAll({ page, limit }: PaginationQueryDto,): Promise<{ data: Student[]; total: number; page: number; limit: number }> {
+     const skip = (page - 1) * limit;
+
+      const [data, total] = await this.studentRepository.findAndCount({
+        skip,
+        take: limit,
+      });
+        return { data, total, page, limit };
   }
 
   findOne(id: number): Promise<Student | null> {

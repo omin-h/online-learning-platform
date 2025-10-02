@@ -3,6 +3,8 @@ import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { UpdateInstructorDto } from 'src/instructors/dto/update-instructor.dto';
+import { PaginationQueryDto } from 'src/common/pagination-query.dto';
+import { Query } from '@nestjs/common';
 
 @Controller('courses')
 export class CoursesController {
@@ -14,8 +16,8 @@ export class CoursesController {
   }
 
   @Get()
-  findAll() {
-    return this.coursesService.findAll();
+  findAll(@Query() paginationQuery: PaginationQueryDto) {
+    return this.coursesService.findAll(paginationQuery);
   }
 
   @Get(':id')

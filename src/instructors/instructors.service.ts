@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Instructor } from './entities/instructor.entity';
 import { CreateInstructorDto } from './dto/create-instructor.dto';
 import { UpdateInstructorDto } from './dto/update-instructor.dto';
+import { PaginationQueryDto } from '../common/pagination-query.dto';
 
 @Injectable()
 export class InstructorsService {
@@ -24,8 +25,15 @@ export class InstructorsService {
   }
 
 
-  findAll(): Promise<Instructor[]> {
-    return this.instructorRepository.find();
+  async findAll({ page, limit }: PaginationQueryDto,
+    ): Promise<{ data: Instructor[]; total: number; page: number; limit: number }> {
+      const skip = (page - 1) * limit;
+     
+      const [data, total] = await this.instructorRepository.findAndCount({
+        skip,
+        take: limit,
+      });
+        return { data, total, page, limit };
   }
 
 

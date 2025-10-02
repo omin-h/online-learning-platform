@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common'
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
+import { PaginationQueryDto } from 'src/common/pagination-query.dto';
+import { Query } from '@nestjs/common';
 
 @Controller('students')
 export class StudentsController {
@@ -13,8 +15,8 @@ export class StudentsController {
   }
 
   @Get()
-  findAll() {
-    return this.studentsService.findAll();
+  findAll(@Query() paginationQuery: PaginationQueryDto) {
+    return this.studentsService.findAll(paginationQuery);
   }
 
   @Get(':id')

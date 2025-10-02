@@ -5,6 +5,7 @@ import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course } from './entities/course.entity';
 import { Repository } from 'typeorm';
 import { Instructor } from 'src/instructors/entities/instructor.entity';
+import { PaginationQueryDto } from 'src/common/pagination-query.dto';
 
 @Injectable()
 export class CoursesService {
@@ -22,8 +23,14 @@ export class CoursesService {
     return this.courseRepository.save(course);
   }
 
-  findAll() {
-    return this.courseRepository.find();
+  async findAll({ page, limit }: PaginationQueryDto,): Promise<{ data: Course[]; total: number; page: number; limit: number }> {
+       const skip = (page - 1) * limit;
+
+        const [data, total] = await this.courseRepository.findAndCount({
+          skip,
+          take: limit,
+        });
+          return { data, total, page, limit };
   }
 
   findOne(id: number): Promise<Course | null> {
