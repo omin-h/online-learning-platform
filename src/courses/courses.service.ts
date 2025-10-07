@@ -65,18 +65,24 @@ export class CoursesService {
 }
 
   async update(id: number, updateCourseDto: UpdateCourseDto): Promise<{ message: string; course: Course }> {
-      const course: Course = new Course();
-      course.id = id;
-      course.title = updateCourseDto.title;
-      course.description = updateCourseDto.description;
-      course.duration = updateCourseDto.duration;
-      course.instructors = updateCourseDto.instructorIds.map(id => ({ id } as Instructor));
-      try{const updatedCourse = await this.courseRepository.save(course);
-      return { message: 'Course updated successfully', course: updatedCourse };
-      } catch (error) {
-        throw new BadRequestException('Error updating course: ' + error.message);
-      }
-    }
+  const course: Course = new Course();
+  course.id = id;
+  course.title = updateCourseDto.title;
+  course.description = updateCourseDto.description;
+  course.duration = updateCourseDto.duration;
+
+  if (!Array.isArray(updateCourseDto.instructorIds)) {
+    throw new BadRequestException('instructorIds must be an array of numbers');
+  }
+  course.instructors = updateCourseDto.instructorIds.map(id => ({ id } as Instructor));
+
+  try {
+    const updatedCourse = await this.courseRepository.save(course);
+    return { message: 'Course updated successfully', course: updatedCourse };
+  } catch (error) {
+    throw new BadRequestException('Error updating course: ' + error.message);
+  }
+}
 
    async remove(id: number): Promise<{ message: string }> {
 
