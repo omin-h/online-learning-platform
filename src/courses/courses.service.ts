@@ -19,7 +19,7 @@ export class CoursesService {
     course.title = createCourseDto.title;
     course.description = createCourseDto.description;
     course.duration = createCourseDto.duration;
-    course.instructor = { id: createCourseDto.instructorId } as any;
+    course.instructors = createCourseDto.instructorIds.map(id => ({ id } as Instructor));
     try{ const savedCourse = await this.courseRepository.save(course);
     return { message: 'Course created successfully', course: savedCourse };
     }catch (error) {
@@ -55,7 +55,7 @@ export class CoursesService {
 
   async findByInstructor(instructorId: number): Promise<Course[]> {
   const courses = await this.courseRepository.find({
-    where: { instructor: { id: instructorId } },
+    where: { instructors: { id: instructorId } },
     relations: ['instructor'],
   });
   if (courses.length === 0) {
@@ -70,7 +70,7 @@ export class CoursesService {
       course.title = updateCourseDto.title;
       course.description = updateCourseDto.description;
       course.duration = updateCourseDto.duration;
-      course.instructor = { id: updateCourseDto.instructorId } as Instructor;
+      course.instructors = updateCourseDto.instructorIds.map(id => ({ id } as Instructor));
       try{const updatedCourse = await this.courseRepository.save(course);
       return { message: 'Course updated successfully', course: updatedCourse };
       } catch (error) {

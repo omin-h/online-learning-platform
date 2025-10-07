@@ -1,6 +1,6 @@
 import { Enroll } from "src/enroll/entities/enroll.entity";
 import { Instructor } from "src/instructors/entities/instructor.entity";
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, ManyToMany, OneToMany, PrimaryGeneratedColumn, JoinTable } from "typeorm";
 
 @Entity()
 export class Course {
@@ -17,8 +17,9 @@ export class Course {
     @Column()
     duration: number;
 
-    @ManyToOne(() => Instructor, instructor => instructor.courses)
-    instructor: Instructor;
+    @ManyToMany(() => Instructor, instructor => instructor.courses)
+    @JoinTable()
+    instructors: Instructor[];
 
     @OneToMany(() => Enroll, enroll => enroll.course)
     enrollments: Enroll[];

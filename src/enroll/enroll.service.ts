@@ -1,6 +1,5 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { CreateEnrollDto } from './dto/create-enroll.dto';
-import { UpdateEnrollDto } from './dto/update-enroll.dto';
 import { Student } from 'src/students/entities/student.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -41,13 +40,19 @@ export class EnrollService {
   async updateStatus(id: number, status: string): Promise<Enroll> {
   const enroll = await this.enrollRepository.findOneBy({ id });
   if (!enroll) {
-    throw new Error('Enrollment not found');
+    throw new NotFoundException('Enrollment not found');
   }
   enroll.status = status;
   return this.enrollRepository.save(enroll);
   }
 
-  remove(id: number) {
-    return this.enrollRepository.delete(id);
+
+  async remove(id: number): Promise<{ message: string }> {
+  const result = await this.enrollRepository.delete(id);
+       if (result.affected === 0) {
+         throw new NotFoundException(`Enrollment with id ${id} not found`);
+       }
+       return { message: 'Unenrollment successful' };
   }
 }
+

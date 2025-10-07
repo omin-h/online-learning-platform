@@ -22,6 +22,6 @@ export class Instructor {
     @Column()
     password: string;
 
-    @OneToMany(() => Course, course => course.instructor)
+    @OneToMany(() => Course, course => course.instructors)
     courses: Course[];
 }
