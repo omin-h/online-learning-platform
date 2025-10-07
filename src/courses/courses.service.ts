@@ -33,6 +33,7 @@ export class CoursesService {
         const [data, total] = await this.courseRepository.findAndCount({
           skip,
           take: limit,
+          relations: ['instructors'],
           where: search ? [
             { title: Like(`%${search}%`) },
             { description: Like(`%${search}%`) },
@@ -44,13 +45,16 @@ export class CoursesService {
         }
   }
 
-  findOne(id: number): Promise<Course | null> {
-      const course = this.courseRepository.findOneBy({ id });
-      if (!course) {
-        throw new NotFoundException(`Course with id ${id} not found`);
-      }
-      return course;
-    }
+  async findOne(id: number): Promise<Course> {
+  const course = await this.courseRepository.findOne({
+    where: { id },
+    relations: ['instructors'],  
+  });
+  if (!course) {
+    throw new NotFoundException(`Course with id ${id} not found`);
+  }
+  return course;
+}
 
 
   async findByInstructor(instructorId: number): Promise<Course[]> {
