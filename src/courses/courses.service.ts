@@ -56,7 +56,7 @@ export class CoursesService {
   async findByInstructor(instructorId: number): Promise<Course[]> {
   const courses = await this.courseRepository.find({
     where: { instructors: { id: instructorId } },
-    relations: ['instructor'],
+    relations: ['instructors'],
   });
   if (courses.length === 0) {
     throw new NotFoundException(`No courses found for instructor with id ${instructorId}`);
