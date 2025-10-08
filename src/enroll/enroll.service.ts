@@ -26,9 +26,12 @@ export class EnrollService {
     }
   }
   
-  findAll() {
-    try{return this.enrollRepository.find();
-    }catch (error) {
+  async findAll(): Promise<Enroll[]> {
+    try {
+      return await this.enrollRepository.find({
+        relations: ['student', 'course'],  // <-- Add this line
+      });
+    } catch (error) {
       throw new BadRequestException('Error fetching enrollments: ' + error.message);
     }
   }
