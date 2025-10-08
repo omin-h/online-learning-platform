@@ -54,7 +54,7 @@ export class CoursesService {
     throw new NotFoundException(`Course with id ${id} not found`);
   }
   return course;
-}
+  }
 
 
   async findByInstructor(instructorId: number): Promise<Course[]> {

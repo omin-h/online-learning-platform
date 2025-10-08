@@ -29,7 +29,7 @@ export class EnrollService {
   async findAll(): Promise<Enroll[]> {
     try {
       return await this.enrollRepository.find({
-        relations: ['student', 'course'],  // <-- Add this line
+        relations: ['student', 'course'],  
       });
     } catch (error) {
       throw new BadRequestException('Error fetching enrollments: ' + error.message);
