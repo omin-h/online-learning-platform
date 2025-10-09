@@ -40,6 +40,21 @@ export class EnrollService {
     return this.enrollRepository.findOneBy({ id });
   }
 
+  async findByStudent(studentId: number): Promise<Enroll[]> {
+  try {
+    const enrollments = await this.enrollRepository.find({
+      where: { student: { id: studentId } },
+      relations: ['student', 'course'],
+    });
+    if (enrollments.length === 0) {
+      throw new NotFoundException(`No enrollments found for student with id ${studentId}`);
+    }
+    return enrollments;
+  } catch (error) {
+    throw new BadRequestException('Error fetching enrollments: ' + error.message);
+  }
+}
+
   async updateStatus(id: number, status: string): Promise<Enroll> {
   const enroll = await this.enrollRepository.findOneBy({ id });
   if (!enroll) {

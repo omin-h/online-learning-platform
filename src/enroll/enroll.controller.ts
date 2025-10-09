@@ -22,6 +22,11 @@ export class EnrollController {
     return this.enrollService.findOne(+id);
   }
 
+  @Get('student/:studentId')
+  findByStudent(@Param('studentId') studentId: string) {
+    return this.enrollService.findByStudent(+studentId);
+  }
+
   @Put(':id/approved')
   approve(@Param('id') id: string) {
     return this.enrollService.updateStatus(+id, 'approved');
