@@ -48,6 +48,27 @@ export class InstructorsService {
     }
   }
 
+  async findAllInstructorCourses(): Promise<any[]> {
+  try {
+    const instructors = await this.instructorRepository.find({
+      relations: ['courses'],
+    });
+
+    return instructors.map(instructor => ({
+      id: instructor.id,
+      name: instructor.name,
+      expertise: instructor.expertise,
+      courseIds: instructor.courses.map(course => ({
+        id: course.id,
+        title: course.title,
+        description: course.description,
+        duration: course.duration,
+      })),
+    }));
+  } catch (error) {
+    throw new BadRequestException('Error fetching instructors: ' + error.message);
+  }
+}
 
   async findOne(id: number): Promise<Instructor | null> {
     const instructor = await this.instructorRepository.findOneBy({ id });

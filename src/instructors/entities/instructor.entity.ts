@@ -1,5 +1,5 @@
 import { Course } from "src/courses/entities/course.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Instructor {
@@ -22,6 +22,6 @@ export class Instructor {
     @Column()
     password: string;
 
-    @OneToMany(() => Course, course => course.instructors)
+    @ManyToMany(() => Course, course => course.instructors)
     courses: Course[];
 }

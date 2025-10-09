@@ -19,6 +19,11 @@ export class InstructorsController {
     return this.instructorsService.findAll(paginationQuery);
   }
 
+  @Get('instructor-courses')
+  findAllInstructorCourses() {
+    return this.instructorsService.findAllInstructorCourses();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.instructorsService.findOne(+id);
