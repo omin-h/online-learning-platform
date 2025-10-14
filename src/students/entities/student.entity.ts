@@ -1,5 +1,6 @@
 import { Enroll } from "src/enroll/entities/enroll.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import * as bcrypt from 'bcrypt';
 
 @Entity()
 export class Student {
@@ -27,4 +28,9 @@ export class Student {
 
     @OneToMany(() => Enroll, enroll => enroll.student)
     enrollments: Enroll[];
+
+    @BeforeInsert()
+    async hashPassword() {
+        this.password = await bcrypt.hash(this.password, 10);
+    }
 }
