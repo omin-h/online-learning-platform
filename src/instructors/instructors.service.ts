@@ -35,6 +35,8 @@ export class InstructorsService {
       const [data, total] = await this.instructorRepository.findAndCount({
         skip,
         take: limit,
+        withDeleted: true,
+        order: { id: 'DESC' },
         where: search ? [
           { name: Like(`%${search}%`) },
           { email: Like(`%${search}%`) },
@@ -95,7 +97,6 @@ export class InstructorsService {
     }
   }
 
-
   // async remove(id: number): Promise<{ message: string }> {
   //   const result = await this.instructorRepository.delete(id);
   //   if (result.affected === 0) {
@@ -110,5 +111,6 @@ export class InstructorsService {
     throw new NotFoundException(`Instructor with id ${id} not found`);
   }
   return { message: 'Instructor removed successfully' };
+  }
 }
-}
+                                

@@ -29,6 +29,7 @@ export class EnrollService {
   async findAll(): Promise<Enroll[]> {
     try {
       return await this.enrollRepository.find({
+        order: { id: 'DESC' },
         relations: ['student', 'course'],  
       });
     } catch (error) {

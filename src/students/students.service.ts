@@ -36,6 +36,7 @@ export class StudentsService {
       const [data, total] = await this.studentRepository.findAndCount({
         skip,
         take: limit,
+        order: { id: 'DESC' },
         where: search ? [
           { firstName: Like(`%${search}%`) },
           { lastName: Like(`%${search}%`) },
