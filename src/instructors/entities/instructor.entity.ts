@@ -1,5 +1,5 @@
 import { Course } from "src/courses/entities/course.entity";
-import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, DeleteDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Instructor {
@@ -24,4 +24,7 @@ export class Instructor {
 
     @ManyToMany(() => Course, course => course.instructors)
     courses: Course[];
+
+    @DeleteDateColumn()
+    deletedAt?: Date;
 }

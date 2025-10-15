@@ -47,6 +47,6 @@ export class InstructorsController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   remove(@Param('id') id: string) {
-    return this.instructorsService.remove(+id);
-  }
+  return this.instructorsService.remove(+id);
+}
 }

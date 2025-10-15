@@ -96,11 +96,19 @@ export class InstructorsService {
   }
 
 
+  // async remove(id: number): Promise<{ message: string }> {
+  //   const result = await this.instructorRepository.delete(id);
+  //   if (result.affected === 0) {
+  //     throw new NotFoundException(`Instructor with id ${id} not found`);
+  //   }
+  //   return { message: 'Instructor removed successfully' };
+  // }
+
   async remove(id: number): Promise<{ message: string }> {
-    const result = await this.instructorRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException(`Instructor with id ${id} not found`);
-    }
-    return { message: 'Instructor removed successfully' };
+  const result = await this.instructorRepository.softDelete(id);
+  if (result.affected === 0) {
+    throw new NotFoundException(`Instructor with id ${id} not found`);
   }
+  return { message: 'Instructor removed successfully' };
+}
 }
